@@ -1,0 +1,42 @@
+@page
+@model PetShop.Web.Pages.Meituan.RedeemModel
+@{ ViewData["Title"] = "美团验券"; }
+
+<header class="content-header">
+    <div><h1>美团验券模拟器</h1><p>仅供技术联调，不连接美团，不得用于实际收银。</p></div>
+    <div class="content-actions"><a class="button button-muted" asp-page="/Meituan/Records">验券记录</a><div class="integration-mode"><span class="status-dot"></span>@Model.ModeName</div></div>
+</header>
+
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage)) { <div class="notice" role="status">@Model.SuccessMessage</div> }
+<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+<div class="notice error" role="alert">外部平台功能已冻结。这里产生的结果都是模拟数据，不会核销顾客的真实团购券。</div>
+
+<section class="content-panel voucher-entry">
+    <form method="post" asp-page-handler="Query" class="voucher-query-form">
+        <label for="voucher-code">美团团购券码</label>
+        <div class="voucher-input-row">
+            <input id="voucher-code" asp-for="VoucherCode" inputmode="numeric" autocomplete="off" autofocus placeholder="输入或扫描顾客券码" />
+            <button type="submit" class="button button-muted">模拟查询</button>
+        </div>
+        <span asp-validation-for="VoucherCode" class="field-validation-error"></span>
+        <p class="form-hint">模拟联调：输入任意 10–24 位数字或字母；以 0000 开头会返回不可用。</p>
+    </form>
+</section>
+
+@if (Model.Quote?.IsUsable == true)
+{
+    <section class="content-panel voucher-confirm">
+        <div class="voucher-result-heading"><div><span>可用套餐</span><h2>@Model.Quote.DealName</h2></div><strong>¥@Model.Quote.SalePrice.ToString("N2")</strong></div>
+        <dl class="detail-list"><dt>套餐编号</dt><dd>@Model.Quote.DealId</dd><dt>门市价</dt><dd>¥@Model.Quote.MarketPrice.ToString("N2")</dd><dt>核销数量</dt><dd>@Model.Quote.Quantity 份</dd><dt>平台提示</dt><dd>@Model.Quote.Message</dd></dl>
+        <form method="post" asp-page-handler="Redeem" class="confirm-form">
+            <input type="hidden" asp-for="VoucherCode" />
+            <input type="hidden" asp-for="RequestId" />
+            <label class="checkbox-row confirm-check"><input asp-for="Confirmed" />我已当面核对顾客券码、套餐和使用条件</label>
+            <span asp-validation-for="Confirmed" class="field-validation-error"></span>
+            <button type="submit" class="button button-muted button-wide">确认模拟核销</button>
+        </form>
+    </section>
+}
+
+<p class="operational-warning">若提交后出现“结果未知”，请先到验券记录核对，禁止重复提交同一券码。</p>

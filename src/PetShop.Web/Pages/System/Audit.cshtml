@@ -1,0 +1,28 @@
+@page
+@model PetShop.Web.Pages.System.AuditModel
+@{ ViewData["Title"] = "操作审计"; }
+
+<header class="content-header">
+    <div><h1>操作审计</h1><p>最近 500 条关键业务记录，只读留痕，不提供删除。</p></div>
+</header>
+
+<section class="content-panel">
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>时间</th><th>操作</th><th>操作人</th><th>对象</th><th>详情</th></tr></thead>
+            <tbody>
+            @foreach (var row in Model.Rows)
+            {
+                <tr>
+                    <td>@row.CreatedAt.ToString("MM-dd HH:mm:ss")</td>
+                    <td><strong>@row.Action</strong></td>
+                    <td>@row.Operator</td>
+                    <td>@row.EntityType<small>@row.EntityId</small></td>
+                    <td>@row.Detail</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.Rows.Count == 0) { <div class="empty-state">还没有关键操作记录。</div> }
+</section>

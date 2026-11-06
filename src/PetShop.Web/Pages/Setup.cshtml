@@ -1,0 +1,16 @@
+@page
+@model PetShop.Web.Pages.SetupModel
+@{ ViewData["Title"] = "首次设置"; Layout = null; }
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>首次设置 - 爪账</title><link rel="stylesheet" href="/css/site.css"/></head>
+<body class="auth-page"><main class="auth-panel">
+    <div class="auth-brand">爪账</div><h1>创建店长账号</h1><p>这是第一次启动。账号只保存在本机，可在断网状态登录。</p>
+    <form method="post" class="form-stack">
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <label>店长姓名<input asp-for="Input.DisplayName" autocomplete="name" autofocus/><span asp-validation-for="Input.DisplayName"></span></label>
+        <label>登录账号<input asp-for="Input.UserName" autocomplete="username"/><span asp-validation-for="Input.UserName"></span></label>
+        <label>登录密码<input asp-for="Input.Password" autocomplete="new-password"/><span asp-validation-for="Input.Password"></span></label>
+        <label>确认密码<input asp-for="Input.ConfirmPassword" autocomplete="new-password"/><span asp-validation-for="Input.ConfirmPassword"></span></label>
+        <button class="button button-primary button-wide" type="submit">完成设置并进入系统</button>
+    </form>
+    <small class="auth-footnote">密码至少 8 位并包含数字。请妥善保存，系统不会上传账号。</small>
+</main><partial name="_ValidationScriptsPartial"/></body></html>

@@ -1,0 +1,65 @@
+@page
+@model PetShop.Web.Pages.Staff.AccountsModel
+@{ ViewData["Title"] = "员工账号"; }
+
+<header class="content-header">
+    <div><h1>员工账号</h1><p>控制谁能登录，以及谁可以接触退款、对账和备份。</p></div>
+    <a class="button button-secondary" asp-page="/Staff/Index">员工与服务</a>
+</header>
+
+@if (TempData["Success"] is string success) { <div class="notice success" role="status">@success</div> }
+@if (TempData["Error"] is string error) { <div class="notice error" role="alert">@error</div> }
+
+<div class="account-layout">
+    <section class="content-panel account-create">
+        <h2>创建登录账号</h2>
+        <p class="form-hint">店员可以办理日常业务；管理员额外拥有退款、对账、员工账号和备份权限。</p>
+        <form method="post" asp-page-handler="Create" class="form-stack">
+            <label>员工姓名<input asp-for="NewAccount.DisplayName" autocomplete="name" /></label>
+            <label>手机号（可选）<input asp-for="NewAccount.Phone" inputmode="tel" autocomplete="tel" /></label>
+            <label>登录账号<input asp-for="NewAccount.UserName" autocomplete="off" /></label>
+            <label>初始密码<input asp-for="NewAccount.Password" autocomplete="new-password" /></label>
+            <label>权限角色
+                <select asp-for="NewAccount.Role"><option value="Clerk">店员</option><option value="Admin">管理员</option></select>
+            </label>
+            <label class="checkbox-row"><input asp-for="NewAccount.IsGroomer" /> 同时是美容师</label>
+            <div asp-validation-summary="All" class="validation-summary"></div>
+            <button class="button button-primary button-wide" type="submit">创建账号</button>
+        </form>
+    </section>
+
+    <section class="content-panel account-list">
+        <h2>现有账号</h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>员工</th><th>登录账号</th><th>权限</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                @foreach (var account in Model.Accounts)
+                {
+                    <tr>
+                        <td><strong>@account.DisplayName</strong><small>@(account.IsGroomer ? "美容师" : "非美容师")</small></td>
+                        <td>@account.UserName</td>
+                        <td>@account.Role</td>
+                        <td><span class="status-pill @(account.Enabled ? "" : "status-disabled")">@(account.Enabled ? "可登录" : "已停用")</span></td>
+                        <td>
+                            @if (account.IsCurrent)
+                            {
+                                <span class="subtle">当前账号</span>
+                            }
+                            else
+                            {
+                                <form method="post" asp-page-handler="Toggle" class="inline-action">
+                                    <input type="hidden" name="userId" value="@account.UserId" />
+                                    <button class="text-action @(account.Enabled ? "danger-link" : "")" type="submit">@(account.Enabled ? "停用" : "启用")</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<partial name="_ValidationScriptsPartial" />

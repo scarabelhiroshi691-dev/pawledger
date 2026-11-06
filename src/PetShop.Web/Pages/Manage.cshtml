@@ -1,0 +1,21 @@
+@page
+@model PetShop.Web.Pages.ManageModel
+@{ ViewData["Title"] = "管理"; }
+<header class="content-header"><div><h1>管理</h1><p>交接班、员工权限、日结和本机数据安全。</p></div></header>
+<section class="content-panel mobile-access-panel"><h2>手机端访问</h2><p>手机和电脑连接同一门店 Wi-Fi 后，在手机浏览器打开：</p>
+@if (Model.MobileUrls.Count == 0) { <div class="notice error">未检测到局域网地址，请确认电脑已连接门店 Wi-Fi。</div> }
+else { <div class="mobile-url-list">@foreach (var url in Model.MobileUrls) { <code>@url</code> }</div> }
+<p class="form-hint">首次使用需运行“配置手机端访问.cmd”，并允许 Windows 专用网络访问。普通 HTTP 可使用业务页面；安装到桌面和摄像头扫码需要 HTTPS。</p></section>
+<nav class="manage-list" aria-label="管理功能">
+    <a asp-page="/Operations/Cash"><span><strong>交接班与支出</strong><small>备用金、店内支出和现金差额</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+    <a asp-page="/GroupBuys/Index"><span><strong>美团团购登记</strong><small>官方核销后记录履约、金额和美容师</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-page="/Staff/Accounts"><span><strong>员工账号</strong><small>管理员、店员和登录状态</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+        <a asp-page="/Staff/Index"><span><strong>员工与服务</strong><small>美容师、服务项目和在职状态</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+        <a asp-page="/Reports/Reconciliation"><span><strong>日结对账</strong><small>会员余额、收款和美容师业绩</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+        <a asp-page="/GroupBuys/Reconcile"><span><strong>团购结算对账</strong><small>确认平台到账并登记团购退款</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+        <a asp-page="/System/Audit"><span><strong>操作审计</strong><small>关键业务操作与操作人留痕</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+        <a asp-page="/System/Backup"><span><strong>备份与恢复</strong><small>保护本机数据库</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+    }
+</nav>

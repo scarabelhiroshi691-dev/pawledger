@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 爪账</title>
+    <meta name="theme-color" content="#082b5c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="~/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="~/icons/pawledger-192.png" />
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="主导航">
+            <a class="brand" asp-page="/Index" aria-label="爪账首页">
+                <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="14" cy="13" r="5"/><circle cx="25" cy="9" r="5"/><circle cx="36" cy="13" r="5"/><circle cx="10" cy="25" r="5"/><circle cx="40" cy="25" r="5"/><path d="M14 35c2-8 8-13 11-13s9 5 11 13c1 5-3 8-7 6-3-1-5-1-8 0-4 2-8-1-7-6Z"/></svg>
+                <span>爪账</span>
+            </a>
+            <nav class="nav-list">
+                <a class="nav-link" asp-page="/Index"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19V9m6 10V5m6 14v-7m6 7V3"/><path d="m3 14 6-5 6 3 6-6"/></svg><span>今日概览</span></a>
+                <a class="nav-link" asp-page="/Members/Index"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-4 2-6 6-6s6 2 6 6M16 8h5m-2.5-2.5v5"/></svg><span>会员与宠物</span></a>
+                <a class="nav-link" asp-page="/Members/Recharge"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="16" height="13" rx="2"/><path d="M3 9h16m2 5h-6m3-3v6"/></svg><span>会员充值</span></a>
+                <a class="nav-link" asp-page="/Operations/Cash"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16"/><path d="M8 14h3m5-2v4m-2-2h4"/></svg><span>交接班与支出</span></a>
+                <a class="nav-link" asp-page="/GroupBuys/Index"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v5a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4V6Z"/><path d="M12 8v8"/></svg><span>团购登记</span></a>
+                <a class="nav-link" asp-page="/Grooming/Create"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-13 4h3m3 0h3"/></svg><span>美容预约</span></a>
+                <a class="nav-link" asp-page="/Grooming/Index"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg><span>美容工单</span></a>
+                <a class="nav-link" asp-page="/Products/Index"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg><span>商品库存</span></a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a class="nav-link" asp-page="/Reports/Transactions"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 7.5 12 12l4-4.5M8 12h8m-4 0v5"/></svg><span>订单退款</span></a>
+                    <a class="nav-link" asp-page="/Reports/Reconciliation"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8m-8 4h8m-8 4h4m3 0 1.5 1.5L21 14"/></svg><span>日结对账</span></a>
+                    <a class="nav-link" asp-page="/Staff/Index"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-4 2-6 6-6 2 0 3.5.5 4.5 1.4M18 14v6m-3-3h6"/></svg><span>员工与服务</span></a>
+                    <a class="nav-link" asp-page="/System/Backup"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg><span>备份与恢复</span></a>
+                }
+            </nav>
+            <div class="offline-note"><span class="status-dot"></span>本机离线运行<form method="post" asp-page="/Logout"><button type="submit">退出登录</button></form></div>
+        </aside>
+        <main class="main-content" role="main">@RenderBody()</main>
+    </div>
+    <nav class="mobile-tabbar" aria-label="手机主导航">
+        <a class="mobile-nav-link" asp-page="/Index"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8m-8 4h5"/></svg><span>收银</span></a>
+        <a class="mobile-nav-link" asp-page="/Members/Index"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-4 2-6 6-6s6 2 6 6M17 7h4m-2-2v4"/></svg><span>会员</span></a>
+        <a class="mobile-nav-link" asp-page="/Grooming/Index"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="m9 9 6 6m0-6-3 3"/></svg><span>美容</span></a>
+        <a class="mobile-nav-link" asp-page="/Products/Index"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5"/></svg><span>商品</span></a>
+        <a class="mobile-nav-link" asp-page="/Manage"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>管理</span></a>
+    </nav>
+    <script src="/js/site.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

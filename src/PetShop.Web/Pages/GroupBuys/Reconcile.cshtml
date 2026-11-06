@@ -1,0 +1,39 @@
+@page
+@model PetShop.Web.Pages.GroupBuys.ReconcileModel
+@{ ViewData["Title"] = "团购结算对账"; }
+
+<header class="content-header"><div><h1>团购结算对账</h1><p>按美团结算账单确认实际到账；平台退款在这里留下反向记录。</p></div><a class="button button-secondary" asp-page="/GroupBuys/Index">返回团购登记</a></header>
+@if (TempData["Success"] is string success) { <div class="notice success" role="status">@success</div> }
+@if (TempData["Error"] is string error) { <div class="notice error" role="alert">@error</div> }
+
+<div class="metric-grid compact-metrics groupbuy-metrics">
+    <article class="metric-card"><span>待结算预计</span><strong>¥@Model.PendingExpected.ToString("N2")</strong></article>
+    <article class="metric-card"><span>已确认到账</span><strong>¥@Model.SettledActual.ToString("N2")</strong></article>
+    <article class="metric-card"><span>累计退款</span><strong>− ¥@Model.Refunded.ToString("N2")</strong></article>
+</div>
+
+<section class="content-panel">
+    <div class="table-wrap"><table class="groupbuy-reconcile-table">
+        <thead><tr><th>履约</th><th>订单与套餐</th><th>金额</th><th>结算</th><th>登记退款</th></tr></thead>
+        <tbody>
+        @foreach (var row in Model.Records)
+        {
+            var refunded = row.Refunds.Sum(x => x.Amount);
+            <tr>
+                <td>@row.RedeemedAt.ToString("MM-dd HH:mm")<small>@(row.Groomer?.Name ?? "未记美容师")</small></td>
+                <td><strong>@row.DealName</strong><small>@row.PlatformOrderNumber</small></td>
+                <td>核销 ¥@row.GrossAmount.ToString("F2")<small>预计 ¥@row.ExpectedSettlementAmount.ToString("F2") / 已退 ¥@refunded.ToString("F2")</small></td>
+                <td>
+                @if (row.SettlementStatus == GroupBuySettlementStatus.Pending)
+                {
+                    <form method="post" asp-page-handler="Settle" class="compact-action-form"><input type="hidden" name="Settlement.Id" value="@row.Id" /><input name="Settlement.ActualAmount" inputmode="decimal" value="@row.ExpectedSettlementAmount.ToString("F2")" aria-label="实际到账金额" /><button class="button button-small" type="submit">确认到账</button></form>
+                }
+                else { <strong>¥@row.ActualSettlementAmount?.ToString("F2")</strong><small>@row.SettledAt?.ToString("MM-dd HH:mm")</small> }
+                </td>
+                <td><form method="post" asp-page-handler="Refund" class="compact-action-form refund-form"><input type="hidden" name="Refund.Id" value="@row.Id" /><input name="Refund.Amount" inputmode="decimal" placeholder="金额" aria-label="退款金额" /><input name="Refund.Reason" placeholder="退款原因" aria-label="退款原因" /><button class="button button-small button-muted" type="submit">登记</button></form></td>
+            </tr>
+        }
+        </tbody>
+    </table></div>
+    @if (Model.Records.Count == 0) { <div class="empty-state">还没有需要对账的团购记录。</div> }
+</section>

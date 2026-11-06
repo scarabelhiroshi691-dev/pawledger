@@ -1,0 +1,63 @@
+@page
+@model IndexModel
+@{ ViewData["Title"] = "今日概览"; }
+<section class="mobile-checkout-home" aria-label="手机收银台">
+    <header class="mobile-home-header"><a class="mobile-brand" asp-page="/Index">爪账</a><span><i></i>本机营业中</span></header>
+    <form method="get" asp-page="/Members/Index" class="mobile-universal-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg><input name="Query" type="search" placeholder="搜索会员、手机号、宠物或会员号" aria-label="搜索会员" /></form>
+    <a class="mobile-scan-action" asp-page="/Scan"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 24V12a2 2 0 0 1 2-2h12M40 10h12a2 2 0 0 1 2 2v12M54 40v12a2 2 0 0 1-2 2H40M24 54H12a2 2 0 0 1-2-2V40M10 32h44"/></svg><strong>扫码收银</strong><small>商品条码 · 会员码</small></a>
+    <div class="mobile-quick-actions" aria-label="常用操作">
+        <a asp-page="/Members/Index"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-4 2-6 6-6s6 2 6 6M16 14h6"/></svg><span>会员查询</span></a>
+        <a asp-page="/Operations/Cash"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16"/><path d="M8 14h3m5-2v4m-2-2h4"/></svg><span>交接班</span></a>
+        <a asp-page="/Grooming/Create"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-7 4v5m-2.5-2.5h5"/></svg><span>新建美容</span></a>
+        <a asp-page="/Members/Recharge"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="16" height="13" rx="2"/><path d="M3 9h16m2 5h-6m3-3v6"/></svg><span>会员充值</span></a>
+    </div>
+    <div class="mobile-work-heading"><h2>待处理</h2><a asp-page="/Grooming/Index">全部</a></div>
+    <div class="mobile-work-list">
+        @if (Model.GroomingAppointments.Count == 0) { <a asp-page="/Grooming/Create"><span class="work-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8m-4-4h8"/></svg></span><span><strong>今天还没有美容安排</strong><small>创建第一笔预约</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a> }
+        @foreach (var item in Model.GroomingAppointments.Take(2)) { <a asp-page="/Grooming/Details" asp-route-id="@item.Id"><span class="work-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="m9 9 6 6m0-6-3 3"/></svg></span><span><strong>@item.PetName · @item.Service</strong><small>@item.Time · 美容师 @item.Groomer · @item.State</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a> }
+        <a asp-page="/Operations/Cash"><span class="work-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16"/><path d="M8 14h3m5-2v4m-2-2h4"/></svg></span><span><strong>交接班与店内支出</strong><small>清点备用金，登记现金和非现金支出</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+        <a asp-page="/GroupBuys/Index"><span class="work-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v5a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4V6Z"/><path d="M12 8v8"/></svg></span><span><strong>美团团购履约</strong><small>@Model.PendingGroupBuyCount 笔待平台结算</small></span><svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+    </div>
+</section>
+<div class="desktop-dashboard">
+<header class="topbar">
+    <label class="search-box"><span aria-hidden="true">⌕</span><input id="memberSearch" type="search" placeholder="搜索宠主、宠物或业务" autocomplete="off" /></label>
+    <div class="topbar-meta"><time>@Model.DateText</time><span class="user-menu">● @User.Identity?.Name</span></div>
+</header>
+<section class="page-heading">
+    <h1>今日概览</h1>
+    <div class="heading-actions"><a class="button button-primary" asp-page="/Members/Recharge"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="16" height="13" rx="2"/><path d="M3 9h16m2 5h-6m3-3v6"/></svg>会员充值</a><a class="button button-secondary" asp-page="/Grooming/Index"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="m9 9 6 6m0-6-3 3"/></svg>美容结算</a></div>
+</section>
+<section class="balance-band" aria-labelledby="balance-title">
+    <h2 id="balance-title" class="sr-only">全店会员余额</h2>
+    <div class="balance-item"><span>会员本金余额</span><strong>@Model.PrincipalBalance.ToString("C", Model.Culture)</strong></div><div class="balance-item"><span>赠送金余额</span><strong>@Model.BonusBalance.ToString("C", Model.Culture)</strong></div><div class="balance-item balance-total"><span>会员总余额</span><strong>@Model.TotalBalance.ToString("C", Model.Culture)</strong></div>
+    <svg class="balance-icon" viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="14" width="43" height="34" rx="4"/><path d="M8 24h43"/><circle cx="49" cy="44" r="12"/><path d="M44 40l5 5 8-9"/></svg>
+</section>
+<section class="daily-strip" aria-label="今日资金摘要">
+    <div><span>今日充值本金</span><strong>@Model.TodayRecharge.ToString("C", Model.Culture)</strong><small>@Model.TodayRechargeCount 笔</small></div><div><span>今日会员消费</span><strong>@Model.TodayMemberSpend.ToString("C", Model.Culture)</strong><small>@Model.TodayMemberSpendCount 笔</small></div><div><span>今日外部收款</span><strong>@Model.TodayExternalPayment.ToString("C", Model.Culture)</strong><small>@Model.TodayExternalPaymentCount 笔</small></div><div><span>今日退款</span><strong class="negative">@Model.TodayRefund.ToString("C", Model.Culture)</strong><small>@Model.TodayRefundCount 笔</small></div>
+</section>
+<div class="dashboard-grid">
+    <section class="panel schedule-panel" id="grooming">
+        <div class="panel-heading"><h2>今日美容安排</h2><a asp-page="/Grooming/Index">查看全部预约 →</a></div>
+        <div class="table-scroll"><table><thead><tr><th>时间</th><th>宠物</th><th>服务</th><th>主美容师</th><th>状态</th><th class="money">金额</th></tr></thead><tbody>
+        @if (Model.GroomingAppointments.Count == 0) { <tr><td colspan="6" class="empty-cell">今天还没有美容安排。<a asp-page="/Grooming/Create">创建第一笔预约</a></td></tr> }
+        @foreach (var item in Model.GroomingAppointments)
+        { <tr class="@(item.StateClass == "active" ? "active-row" : null)" data-search="@item.SearchText"><td>@item.Time</td><td><strong>@item.PetName</strong><small>@item.Breed</small></td><td>@item.Service</td><td>@item.Groomer</td><td><span class="state state-@item.StateClass"><i></i>@item.State</span></td><td class="money"><a asp-page="/Grooming/Details" asp-route-id="@item.Id">@item.Amount.ToString("C", Model.Culture)</a></td></tr> }
+        </tbody></table></div>
+    </section>
+    <section class="panel reconciliation" id="reconciliation">
+        <div class="panel-heading"><h2>余额对账</h2><a asp-page="/Reports/Reconciliation">查看明细 →</a></div>
+        <div class="reconciliation-status"><span class="checkmark">@(Model.IsReconciled ? "✓" : "!")</span><div><strong>@(Model.IsReconciled ? "流水与余额一致" : "发现余额差异")</strong><small>按全部流水实时校验</small></div></div>
+        <dl><div><dt>系统结存（本金+赠送金）</dt><dd>@Model.TotalBalance.ToString("C", Model.Culture)</dd></div><div><dt>今日外部收款合计</dt><dd>@Model.TodayExternalPayment.ToString("C", Model.Culture)</dd></div><div><dt>今日退款合计</dt><dd class="negative">-@Model.TodayRefund.ToString("C", Model.Culture)</dd></div><div><dt>今日会员消费</dt><dd>@Model.TodayMemberSpend.ToString("C", Model.Culture)</dd></div></dl>
+        <a class="detail-button" asp-page="/Reports/Reconciliation">查看对账明细</a>
+    </section>
+</div>
+<section class="panel ledger-panel" id="ledger">
+    <div class="panel-heading"><h2>最近会员流水</h2><a asp-page="/Members/Ledger">查看全部流水 →</a></div>
+    <div class="table-scroll"><table><thead><tr><th>时间</th><th>会员</th><th>类型</th><th class="money">本金变动</th><th class="money">赠送金变动</th><th>备注</th></tr></thead><tbody>
+    @if (Model.RecentLedger.Count == 0) { <tr><td colspan="6" class="empty-cell">暂无会员流水。完成首笔充值后会显示在这里。</td></tr> }
+    @foreach (var item in Model.RecentLedger)
+    { <tr data-search="@item.SearchText"><td>@item.Time</td><td>@item.Member</td><td>@item.Type</td><td class="money @item.PrincipalClass">@item.Principal</td><td class="money @item.BonusClass">@item.Bonus</td><td>@item.Note</td></tr> }
+    </tbody></table></div>
+</section>
+</div>

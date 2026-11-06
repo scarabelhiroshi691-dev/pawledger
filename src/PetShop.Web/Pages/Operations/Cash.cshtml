@@ -1,0 +1,106 @@
+@page
+@model PetShop.Web.Pages.Operations.CashModel
+@using PetShop.Web.Data
+@{ ViewData["Title"] = "交接班与支出"; }
+
+<header class="content-header">
+    <div><h1>交接班与支出</h1><p>备用金、现金收款和店内支出逐项核对，差额不再靠口头交接。</p></div>
+    <span class="shift-state @(Model.OpenShift is null ? "closed" : "open")">@(Model.OpenShift is null ? "当前未开班" : $"本班已运行 {(DateTimeOffset.Now - Model.OpenShift.OpenedAt).Hours} 小时")</span>
+</header>
+
+@if (TempData["Success"] is string success) { <div class="notice success" role="status">@success</div> }
+@if (TempData["Error"] is string error) { <div class="notice error" role="alert">@error</div> }
+
+@if (Model.OpenShift is null)
+{
+    <section class="cash-opening" aria-labelledby="open-shift-title">
+        <div>
+            <span class="section-index">01 / 开班</span>
+            <h2 id="open-shift-title">先清点备用金</h2>
+            <p>输入钱箱现有现金。从开班起，现金充值、现金销售和现金支出会自动进入本班次。</p>
+        </div>
+        <form method="post" asp-page-handler="Open" class="cash-primary-form">
+            <label>开班备用金（元）<input asp-for="Open.OpeningCash" inputmode="decimal" /></label>
+            <label>开班备注（可选）<input asp-for="Open.Note" placeholder="例如：早班，小王接班" /></label>
+            <div asp-validation-summary="All" class="validation-summary"></div>
+            <button type="submit" class="button button-primary">确认开班</button>
+        </form>
+    </section>
+}
+else
+{
+    <section class="cash-position" aria-labelledby="cash-position-title">
+        <div class="cash-position-lead">
+            <span class="section-index">本班现金</span>
+            <h2 id="cash-position-title">系统应有</h2>
+            <strong>¥@Model.Position!.ExpectedCash.ToString("F2")</strong>
+            <small>开班 @Model.OpenShift.OpenedAt.ToString("MM-dd HH:mm")</small>
+        </div>
+        <dl>
+            <div><dt>开班备用金</dt><dd>¥@Model.Position.OpeningCash.ToString("F2")</dd></div>
+            <div><dt>现金充值</dt><dd class="positive">+ ¥@Model.Position.CashRecharges.ToString("F2")</dd></div>
+            <div><dt>现金销售</dt><dd class="positive">+ ¥@Model.Position.CashSales.ToString("F2")</dd></div>
+            <div><dt>现金支出</dt><dd class="negative">− ¥@Model.Position.CashExpenses.ToString("F2")</dd></div>
+        </dl>
+    </section>
+
+    <div class="cash-workspace">
+        <section class="content-panel">
+            <span class="section-index">02 / 记支出</span>
+            <h2>登记店内支出</h2>
+            <form method="post" asp-page-handler="Expense" class="form-grid cash-expense-form">
+                <label class="field">分类
+                    <select asp-for="Expense.Category">
+                        <option value="Supplies">耗材采购</option><option value="Utilities">水电物业</option><option value="Rent">房租</option>
+                        <option value="Wages">工资</option><option value="Maintenance">维修</option><option value="Marketing">营销</option><option value="Other">其他</option>
+                    </select>
+                </label>
+                <label class="field">金额（元）<input asp-for="Expense.Amount" inputmode="decimal" /></label>
+                <label class="field">支付方式
+                    <select asp-for="Expense.PaymentMethod"><option value="Cash">现金</option><option value="WeChat">微信</option><option value="Alipay">支付宝</option><option value="BankCard">银行卡</option><option value="Other">其他</option></select>
+                </label>
+                <label class="field">收款方（可选）<input asp-for="Expense.Payee" placeholder="供应商或收款人" /></label>
+                <label class="field span-2">用途说明<input asp-for="Expense.Note" placeholder="例如：采购猫砂 4 袋" /></label>
+                <div asp-validation-summary="All" class="validation-summary span-2"></div>
+                <div class="form-actions span-2"><button type="submit" class="button button-primary">登记支出</button></div>
+            </form>
+        </section>
+
+        <section class="content-panel close-shift-panel">
+            <span class="section-index">03 / 关班</span>
+            <h2>清点钱箱并交班</h2>
+            <p>系统应有 <strong>¥@Model.Position.ExpectedCash.ToString("F2")</strong>。请输入实际清点金额，系统自动计算长短款。</p>
+            <form method="post" asp-page-handler="Close" class="form-stack">
+                <input asp-for="Close.ShiftId" type="hidden" />
+                <label>实点现金（元）<input asp-for="Close.CountedCash" inputmode="decimal" /></label>
+                <label>差额说明（有差额时填写）<textarea asp-for="Close.Note"></textarea></label>
+                <div asp-validation-summary="All" class="validation-summary"></div>
+                <button type="submit" class="button button-secondary button-wide">确认关班</button>
+            </form>
+        </section>
+    </div>
+}
+
+<section class="content-panel expense-history">
+    <div class="section-heading"><div><span class="section-index">今日</span><h2>支出记录</h2></div><strong>¥@Model.TodayExpenseTotal.ToString("F2")</strong></div>
+    <div class="table-wrap"><table><thead><tr><th>时间</th><th>分类</th><th>用途</th><th>收款方</th><th>方式</th><th class="money">金额</th></tr></thead><tbody>
+    @foreach (var item in Model.TodayExpenses)
+    {
+        <tr><td>@item.OccurredAt.ToString("HH:mm")</td><td>@PetShop.Web.Pages.Operations.CashModel.CategoryText(item.Category)</td><td>@item.Note</td><td>@(string.IsNullOrWhiteSpace(item.Payee) ? "—" : item.Payee)</td><td>@PetShop.Web.Pages.Operations.CashModel.PaymentText(item.PaymentMethod)</td><td class="money negative">− ¥@item.Amount.ToString("F2")</td></tr>
+    }
+    @if (Model.TodayExpenses.Count == 0) { <tr><td colspan="6" class="empty-cell">今天还没有登记店内支出。</td></tr> }
+    </tbody></table></div>
+</section>
+
+<section class="content-panel shift-history">
+    <div class="section-heading"><div><span class="section-index">最近 20 班</span><h2>交接记录</h2></div></div>
+    <div class="table-wrap"><table><thead><tr><th>开班时间</th><th>关班时间</th><th class="money">备用金</th><th class="money">系统应有</th><th class="money">实点</th><th class="money">差额</th></tr></thead><tbody>
+    @foreach (var shift in Model.RecentShifts)
+    {
+        <tr><td>@shift.OpenedAt.ToString("MM-dd HH:mm")</td><td>@(shift.ClosedAt?.ToString("MM-dd HH:mm") ?? "进行中")</td><td class="money">¥@shift.OpeningCash.ToString("F2")</td><td class="money">@(shift.ExpectedCash is null ? "—" : $"¥{shift.ExpectedCash:F2}")</td><td class="money">@(shift.CountedCash is null ? "—" : $"¥{shift.CountedCash:F2}")</td><td class="money @(shift.Difference == 0 ? "positive" : shift.Difference is null ? "" : "negative")">@(shift.Difference is null ? "—" : $"¥{shift.Difference:+0.00;-0.00;0.00}")</td></tr>
+    }
+    @if (Model.RecentShifts.Count == 0) { <tr><td colspan="6" class="empty-cell">完成第一次开班后，交接记录会出现在这里。</td></tr> }
+    </tbody></table></div>
+</section>
+
+<partial name="_ValidationScriptsPartial" />

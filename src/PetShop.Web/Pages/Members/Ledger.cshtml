@@ -1,0 +1,8 @@
+@page
+@model PetShop.Web.Pages.Members.LedgerModel
+@{ ViewData["Title"] = "会员流水"; }
+<div class="content-header"><div><h1>会员资金流水</h1><p>流水不可编辑或删除，纠错只能通过退款或冲正追加记录。</p></div></div>
+<section class="content-panel"><div class="data-toolbar"><form method="get"><input asp-for="Query" placeholder="宠主、手机号、卡号"/><button class="button button-muted">搜索</button></form></div><div class="table-scroll"><table><thead><tr><th>时间</th><th>会员</th><th>卡号</th><th>类型</th><th>账户</th><th class="money">变动</th><th class="money">变动后</th><th>备注</th></tr></thead><tbody>
+@if (Model.Rows.Count == 0) { <tr><td colspan="8" class="empty-cell">暂无匹配流水。</td></tr> }
+@foreach (var row in Model.Rows) { <tr><td>@row.Time</td><td>@row.Customer</td><td>@row.CardNumber</td><td>@row.Kind</td><td>@row.Bucket</td><td class="money @(row.Amount >= 0 ? "positive" : "negative")">@row.Amount.ToString("+¥0.00;-¥0.00")</td><td class="money">¥@row.BalanceAfter.ToString("N2")</td><td>@row.Note</td></tr> }
+</tbody></table></div></section>

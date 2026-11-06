@@ -1,0 +1,13 @@
+@page
+@model PetShop.Web.Pages.ScanModel
+@{ ViewData["Title"] = "扫码收银"; }
+<header class="content-header"><div><h1>扫码收银</h1><p>识别会员码或商品条码。</p></div></header>
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage)) { <div class="notice error" role="alert">@Model.ErrorMessage</div> }
+<section class="content-panel scan-panel">
+    <video id="scanVideo" playsinline muted hidden></video>
+    <div id="scanFrame" class="scan-frame" aria-hidden="true"><span></span></div>
+    <p id="scanStatus">点击“启动摄像头”扫描；若浏览器或局域网环境不支持，请直接输入编码。</p>
+    <button id="startScanner" type="button" class="button button-secondary">启动摄像头</button>
+    <form method="get" class="voucher-query-form scan-manual-form"><label for="scan-code">手动输入</label><div class="voucher-input-row"><input id="scan-code" asp-for="Code" autocomplete="off" inputmode="numeric" placeholder="会员号、手机号或商品条码" /><button class="button button-primary" type="submit">识别并继续</button></div></form>
+</section>
+@section Scripts { <script src="/js/scanner.js"></script> }

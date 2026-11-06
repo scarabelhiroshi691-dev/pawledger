@@ -1,0 +1,47 @@
+# .NET / IDE
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.suo
+
+# Local application data and secrets
+*.db
+*.db-shm
+*.db-wal
+/data/
+/backups/
+*.pfx
+*.p12
+*.jks
+*.keystore
+*.key
+.env
+.env.*
+!.env.example
+
+# Test and browser automation output
+/TestResults/
+/playwright-report/
+/test-results/
+/.playwright-cli/
+/output/
+
+# Build, packaging, and scratch output
+/dist/
+/tmp/
+/tasks/
+*.apk
+*.aab
+*.zip
+*.log
+
+# Android / Gradle generated files
+**/.gradle/
+**/build/
+local.properties
+
+# OS metadata
+.DS_Store
+Thumbs.db

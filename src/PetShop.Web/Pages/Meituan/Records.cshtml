@@ -1,0 +1,19 @@
+@page
+@model PetShop.Web.Pages.Meituan.RecordsModel
+@{ ViewData["Title"] = "美团验券记录"; }
+
+<header class="content-header"><div><h1>美团验券记录</h1><p>核对每次查询、核销和撤销结果，防止重复验券。</p></div><a class="button button-primary" asp-page="/Meituan/Redeem">美团验券</a></header>
+@if (!string.IsNullOrWhiteSpace(Model.Notice)) { <div class="notice" role="status">@Model.Notice</div> }
+<section class="content-panel">
+    <div class="table-wrap"><table><thead><tr><th>时间</th><th>券码</th><th>套餐</th><th class="money">售价</th><th>状态</th><th>平台记录号</th><th>操作</th></tr></thead><tbody>
+    @if (Model.Records.Count == 0) { <tr><td colspan="7" class="empty-cell">还没有验券记录。先查询一张测试券验证流程。</td></tr> }
+    @foreach (var item in Model.Records)
+    {
+        <tr><td>@item.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td><td>@item.VoucherCodeMasked</td><td><strong>@item.DealName</strong><small>@item.DealId</small></td><td class="money">¥@item.SalePrice.ToString("N2")</td><td><span class="status-pill status-@item.Status.ToString().ToLowerInvariant()">@RecordsModel.StatusText(item.Status)</span></td><td>@item.ProviderTransactionId</td><td>
+        @if (item.Status == PetShop.Web.Data.MeituanVoucherStatus.Redeemed)
+        { <form method="post" asp-page-handler="Revoke" class="inline-form compact"><input type="hidden" name="id" value="@item.Id" /><input name="reason" required minlength="2" placeholder="撤销原因" /><button class="button button-danger" type="submit">撤销</button></form> }
+        else { <span class="subtle">@item.LastProviderMessage</span> }
+        </td></tr>
+    }
+    </tbody></table></div>
+</section>

@@ -1,0 +1,18 @@
+@page
+@model PetShop.Web.Pages.Members.CreateModel
+@{ ViewData["Title"] = "新建会员"; }
+<div class="content-header"><div><h1>新建会员</h1><p>创建宠主、会员卡，并可同时录入第一只宠物。</p></div></div>
+<section class="content-panel"><form method="post">
+    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+    <div class="form-grid">
+        <label class="field">宠主姓名<input asp-for="Input.CustomerName" autofocus/><span asp-validation-for="Input.CustomerName"></span></label>
+        <label class="field">手机号<input asp-for="Input.Phone" inputmode="tel"/><span asp-validation-for="Input.Phone"></span></label>
+        <label class="field span-2">宠主备注<textarea asp-for="Input.CustomerNotes"></textarea><span asp-validation-for="Input.CustomerNotes"></span></label>
+        <div class="span-2 detail-section"><h2>第一只宠物（可选）</h2></div>
+        <label class="field">宠物名字<input asp-for="Input.PetName"/><span asp-validation-for="Input.PetName"></span></label>
+        <label class="field">种类<select asp-for="Input.Species"><option value="">请选择</option><option>狗</option><option>猫</option><option>其他</option></select></label>
+        <label class="field">品种<input asp-for="Input.Breed"/></label><label class="field">性别<select asp-for="Input.Sex" asp-items="Html.GetEnumSelectList<PetShop.Web.Data.PetSex>()"></select></label>
+        <label class="field">体重（kg）<input asp-for="Input.WeightKg" inputmode="decimal"/></label><label class="field">疫苗提醒日期<input asp-for="Input.VaccineDueDate" type="date"/></label>
+        <label class="field span-2">健康与禁忌备注<textarea asp-for="Input.HealthNotes"></textarea></label>
+    </div><div class="form-actions"><a class="button button-muted" asp-page="Index">取消</a><button class="button button-primary" type="submit">保存会员</button></div>
+</form></section><partial name="_ValidationScriptsPartial"/>

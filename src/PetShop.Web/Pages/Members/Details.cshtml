@@ -1,0 +1,16 @@
+@page "{id:guid}"
+@model PetShop.Web.Pages.Members.DetailsModel
+@{ ViewData["Title"] = "会员详情"; }
+@if (TempData["Success"] is string success) { <div class="notice">@success</div> }
+<div class="content-header"><div><h1>@Model.Customer!.Name</h1><p>@Model.Customer.Phone · 会员卡 @Model.Card!.CardNumber</p></div><div class="content-actions"><a class="button button-primary" asp-page="Recharge" asp-route-cardId="@Model.Card.Id">会员充值</a></div></div>
+<section class="content-panel"><div class="summary-line"><div><span>本金余额</span><strong>@Model.Card.PrincipalBalance.ToString("C", Model.Culture)</strong></div><div><span>赠送金余额</span><strong>@Model.Card.BonusBalance.ToString("C", Model.Culture)</strong></div><div><span>可用总额</span><strong class="positive">@((Model.Card.PrincipalBalance + Model.Card.BonusBalance).ToString("C", Model.Culture))</strong></div><div><span>积分</span><strong>@Model.Card.Points</strong></div></div></section>
+<section class="content-panel detail-section"><h2>宠物档案</h2><div class="table-scroll"><table><thead><tr><th>名字</th><th>种类/品种</th><th>性别</th><th>体重</th><th>疫苗提醒</th><th>健康备注</th></tr></thead><tbody>
+@if (Model.Customer.Pets.Count == 0) { <tr><td colspan="6" class="empty-cell">还没有宠物档案，可在下方添加。</td></tr> }
+@foreach (var pet in Model.Customer.Pets) { <tr><td><strong>@pet.Name</strong></td><td>@pet.Species / @pet.Breed</td><td>@Model.SexName(pet.Sex)</td><td>@(pet.WeightKg?.ToString("0.##") ?? "—") kg</td><td>@(pet.VaccineDueDate?.ToString("yyyy-MM-dd") ?? "—")</td><td>@pet.HealthNotes</td></tr> }
+</tbody></table></div>
+<details class="detail-section"><summary>添加宠物</summary><form method="post" asp-page-handler="AddPet" class="form-grid compact-form"><input type="hidden" name="id" value="@Model.Customer.Id"/><label class="field">宠物名字<input asp-for="PetInput.Name"/></label><label class="field">种类<select asp-for="PetInput.Species"><option>狗</option><option>猫</option><option>其他</option></select></label><label class="field">品种<input asp-for="PetInput.Breed"/></label><label class="field">体重（kg）<input asp-for="PetInput.WeightKg"/></label><label class="field span-2">健康备注<textarea asp-for="PetInput.HealthNotes"></textarea></label><div class="form-actions span-2"><button class="button button-primary" type="submit">保存宠物</button></div></form></details>
+</section>
+<section class="content-panel detail-section"><h2>最近资金流水</h2><div class="table-scroll"><table><thead><tr><th>时间</th><th>类型</th><th>资金账户</th><th class="money">变动</th><th class="money">变动后余额</th><th>备注</th></tr></thead><tbody>
+@if (Model.Ledger.Count == 0) { <tr><td colspan="6" class="empty-cell">暂无资金流水。</td></tr> }
+@foreach (var row in Model.Ledger) { <tr><td>@row.Time</td><td>@row.Kind</td><td>@row.Bucket</td><td class="money @(row.Amount >= 0 ? "positive" : "negative")">@row.Amount.ToString("+¥0.00;-¥0.00", Model.Culture)</td><td class="money">@row.BalanceAfter.ToString("C", Model.Culture)</td><td>@row.Note</td></tr> }
+</tbody></table></div></section>

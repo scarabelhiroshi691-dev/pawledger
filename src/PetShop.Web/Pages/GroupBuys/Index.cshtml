@@ -1,0 +1,65 @@
+@page
+@model PetShop.Web.Pages.GroupBuys.IndexModel
+@{ ViewData["Title"] = "美团团购登记"; }
+
+<header class="content-header">
+    <div><h1>美团团购登记</h1><p>真实核销在美团商家端完成；这里记录店内履约、实际美容师和应收结算。</p></div>
+    @if (User.IsInRole("Admin")) { <a class="button button-secondary" asp-page="/GroupBuys/Reconcile">结算对账</a> }
+</header>
+
+@if (TempData["Success"] is string success) { <div class="notice success" role="status">@success</div> }
+<div asp-validation-summary="All" class="validation-summary"></div>
+
+<section class="groupbuy-trust-strip" aria-label="操作边界">
+    <strong>先核销，后登记</strong>
+    <span>本页不会连接美团，也不会改变顾客团购券状态。</span>
+</section>
+
+<div class="groupbuy-layout">
+    <section class="content-panel groupbuy-entry">
+        <div class="section-index">01 / 店内履约</div>
+        <h2>登记已核销团购</h2>
+        <form method="post" class="form-stack">
+            <div class="form-grid two-up">
+                <label>美团订单号<input asp-for="Input.PlatformOrderNumber" autocomplete="off" placeholder="完整订单号，用于防止重复登记" /></label>
+                <label>券码后四位（可选）<input asp-for="Input.VoucherCodeSuffix" autocomplete="off" inputmode="numeric" placeholder="仅记录后四位" /></label>
+            </div>
+            <label>团购套餐名称<input asp-for="Input.DealName" placeholder="例如：小型犬精洗护理套餐" /></label>
+            <div class="form-grid two-up">
+                <label>顾客称呼（可选）<input asp-for="Input.CustomerName" /></label>
+                <label>宠物姓名（可选）<input asp-for="Input.PetName" /></label>
+            </div>
+            <div class="form-grid two-up">
+                <label>实际美容师
+                    <select asp-for="Input.GroomerId"><option value="">非美容项目 / 暂不记录</option>@foreach (var x in Model.Groomers) { <option value="@x.Id">@x.Name</option> }</select>
+                </label>
+                <label>美团商家端核销时间<input asp-for="Input.RedeemedAt" type="datetime-local" /></label>
+            </div>
+            <div class="form-grid two-up">
+                <label>核销金额（元）<input asp-for="Input.GrossAmount" inputmode="decimal" /></label>
+                <label>预计结算到账（元）<input asp-for="Input.ExpectedSettlementAmount" inputmode="decimal" /></label>
+            </div>
+            <label>备注（可选）<textarea asp-for="Input.Note" rows="2" placeholder="特殊服务内容、平台活动补贴等"></textarea></label>
+            <button class="button button-primary button-wide" type="submit">保存团购履约</button>
+        </form>
+    </section>
+
+    <section class="content-panel groupbuy-recent">
+        <div class="section-index">02 / 最近登记</div>
+        <h2>待结算与已到账</h2>
+        <div class="groupbuy-record-list">
+        @foreach (var row in Model.Recent)
+        {
+            var refunded = row.Refunds.Sum(x => x.Amount);
+            <article class="groupbuy-record">
+                <div><strong>@row.DealName</strong><small>@row.RedeemedAt.ToString("MM-dd HH:mm") · @(row.Groomer?.Name ?? "未记美容师")</small></div>
+                <div class="groupbuy-amount"><strong>¥@row.GrossAmount.ToString("F2")</strong><span class="status-pill @(row.SettlementStatus == GroupBuySettlementStatus.Settled ? "" : "status-disabled")">@(row.SettlementStatus == GroupBuySettlementStatus.Settled ? "已到账" : "待结算")</span></div>
+                <dl><dt>订单号</dt><dd>@row.PlatformOrderNumber</dd><dt>预计到账</dt><dd>¥@row.ExpectedSettlementAmount.ToString("F2")</dd>@if (refunded > 0) { <dt>累计退款</dt><dd>− ¥@refunded.ToString("F2")</dd> }</dl>
+            </article>
+        }
+        </div>
+        @if (Model.Recent.Count == 0) { <div class="empty-state">完成第一笔团购登记后会显示在这里。</div> }
+    </section>
+</div>
+
+<partial name="_ValidationScriptsPartial" />

@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore
+        run: dotnet restore PetShopManagement.slnx
+      - name: Build
+        run: dotnet build PetShopManagement.slnx --configuration Release --no-restore
+      - name: Test
+        run: dotnet test PetShopManagement.slnx --configuration Release --no-build

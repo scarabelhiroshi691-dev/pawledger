@@ -1,0 +1,9 @@
+@page
+@{ ViewData["Title"] = "没有权限"; }
+
+<section class="permission-message" aria-labelledby="permission-title">
+    <span aria-hidden="true">403</span>
+    <h1 id="permission-title">这个操作需要管理员权限</h1>
+    <p>当前账号可以继续办理会员、收银、美容和交接班业务。</p>
+    <a class="button button-primary" asp-page="/Index">返回收银首页</a>
+</section>

@@ -1,0 +1,16 @@
+* text=auto
+
+*.sh text eol=lf
+gradlew text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.jar binary
+
+# Vendored libraries keep their upstream formatting.
+src/PetShop.Web/wwwroot/lib/** -whitespace

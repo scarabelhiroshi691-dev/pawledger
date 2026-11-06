@@ -1,0 +1,11 @@
+@page
+@model PetShop.Web.Pages.Members.IndexModel
+@{ ViewData["Title"] = "会员与宠物"; }
+<div class="content-header"><div><h1>会员与宠物</h1><p>按手机号、宠主或宠物快速查找，余额分本金和赠送金显示。</p></div><div class="content-actions"><a class="button button-primary" asp-page="Create">新建会员</a></div></div>
+<section class="content-panel">
+    <div class="data-toolbar"><form method="get"><input asp-for="Query" placeholder="手机号、宠主或宠物"/><button class="button button-muted" type="submit">搜索</button></form><span class="subtle">共 @Model.Members.Count 位</span></div>
+    <div class="table-scroll"><table><thead><tr><th>宠主</th><th>手机号</th><th>宠物</th><th>卡号</th><th class="money">本金</th><th class="money">赠送金</th><th class="money">可用余额</th><th></th></tr></thead><tbody>
+    @if (Model.Members.Count == 0) { <tr><td class="empty-cell" colspan="8">还没有会员数据。<a asp-page="Create">建立第一位会员</a></td></tr> }
+    @foreach (var item in Model.Members) { <tr><td><strong>@item.Name</strong></td><td>@item.Phone</td><td>@item.Pets</td><td>@item.CardNumber</td><td class="money">@item.Principal.ToString("C", Model.Culture)</td><td class="money">@item.Bonus.ToString("C", Model.Culture)</td><td class="money positive">@item.Total.ToString("C", Model.Culture)</td><td><a asp-page="Details" asp-route-id="@item.Id">查看 →</a></td></tr> }
+    </tbody></table></div>
+</section>

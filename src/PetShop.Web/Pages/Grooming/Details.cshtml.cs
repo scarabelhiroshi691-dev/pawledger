@@ -1,0 +1,10 @@
+using Microsoft.AspNetCore.Identity; using Microsoft.AspNetCore.Mvc; using Microsoft.AspNetCore.Mvc.Rendering; using Microsoft.AspNetCore.Mvc.RazorPages; using Microsoft.EntityFrameworkCore; using PetShop.Web.Data; using PetShop.Web.Services;
+namespace PetShop.Web.Pages.Grooming;
+public sealed class DetailsModel(ApplicationDbContext db,OrderService orders,UserManager<IdentityUser> users):PageModel
+{
+ public GroomingOrder Order{get;private set;}=null!; public List<SelectListItem> Groomers{get;private set;}=[]; public List<SelectListItem> Methods{get;}=[new("现金","1"),new("微信","2"),new("支付宝","3"),new("银行卡","4"),new("其他","5")];
+ [BindProperty]public Guid GroomerId{get;set;} [BindProperty]public PaymentMethod Method{get;set;}=PaymentMethod.Cash;[BindProperty]public string RequestId{get;set;}=Guid.NewGuid().ToString("N");
+ public async Task<IActionResult> OnGetAsync(Guid id){if(!await LoadAsync(id))return NotFound();GroomerId=Order.ActualGroomerId??Guid.Empty;return Page();}
+ public async Task<IActionResult> OnPostCheckoutAsync(Guid id){var user=await users.GetUserAsync(User);try{var card=await db.GroomingOrders.Where(x=>x.Id==id).Select(x=>x.Customer.MemberCard!.Id).SingleOrDefaultAsync();Guid? cardId=card==Guid.Empty?null:card;var result=await orders.CompleteGroomingAsync(id,GroomerId,cardId,Method,RequestId,user!.Id);TempData["Success"]=$"结算完成：卡本金 ¥{result.PrincipalPaid:F2}，赠送金 ¥{result.BonusPaid:F2}，外部 ¥{result.ExternalPaid:F2}。";return RedirectToPage(new{id});}catch(Exception ex){ModelState.AddModelError("",ex.Message);await LoadAsync(id);RequestId=Guid.NewGuid().ToString("N");return Page();}}
+ private async Task<bool> LoadAsync(Guid id){Order=await db.GroomingOrders.AsNoTracking().Include(x=>x.Customer).ThenInclude(x=>x.MemberCard).Include(x=>x.Pet).Include(x=>x.ServiceItem).Include(x=>x.ActualGroomer).SingleOrDefaultAsync(x=>x.Id==id)??null!;var gs=await db.StaffMembers.AsNoTracking().Where(x=>x.IsActive&&x.IsGroomer).OrderBy(x=>x.Name).ToListAsync();Groomers=gs.Select(x=>new SelectListItem(x.Name,x.Id.ToString())).ToList();return Order is not null;}
+}

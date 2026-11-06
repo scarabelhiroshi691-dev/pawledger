@@ -1,0 +1,14 @@
+@page
+@model PetShop.Web.Pages.LoginModel
+@{ ViewData["Title"] = "登录"; Layout = null; }
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>登录 - 爪账</title><link rel="stylesheet" href="/css/site.css"/></head>
+<body class="auth-page"><main class="auth-panel">
+    <div class="auth-brand">爪账</div><h1>欢迎回来</h1><p>登录店内管理系统。断网不会影响使用。</p>
+    <form method="post" class="form-stack">
+        <input type="hidden" asp-for="ReturnUrl"/><div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <label>登录账号<input asp-for="Input.UserName" autocomplete="username" autofocus/><span asp-validation-for="Input.UserName"></span></label>
+        <label>登录密码<input asp-for="Input.Password" autocomplete="current-password"/><span asp-validation-for="Input.Password"></span></label>
+        <label class="checkbox-row"><input asp-for="Input.RememberMe"/>在这台店内电脑上保持登录</label>
+        <button class="button button-primary button-wide" type="submit">登录</button>
+    </form>
+</main><partial name="_ValidationScriptsPartial"/></body></html>

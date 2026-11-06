@@ -1,0 +1,11 @@
+@page
+@model PetShop.Web.Pages.Members.RechargeModel
+@{ ViewData["Title"] = "会员充值"; }
+<div class="content-header"><div><h1>会员充值</h1><p>本金与赠送金分别入账，提交后不可删除，只能按原单撤销。</p></div></div>
+<section class="content-panel"><form method="post">
+    <input type="hidden" asp-for="Input.RequestId"/><div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+    <div class="form-grid"><label class="field span-2">选择会员<select asp-for="Input.MemberCardId" asp-items="Model.MemberOptions"><option value="">请选择会员</option></select><span asp-validation-for="Input.MemberCardId"></span></label>
+    <label class="field">实收本金<input asp-for="Input.Principal" inputmode="decimal" autofocus/><span asp-validation-for="Input.Principal"></span></label><label class="field">赠送金<input asp-for="Input.Bonus" inputmode="decimal"/><span asp-validation-for="Input.Bonus"></span></label>
+    <label class="field">收款方式<select asp-for="Input.Method" asp-items="Model.PaymentMethods"></select></label><label class="field">备注<input asp-for="Input.Note" placeholder="例如：充1000赠100"/></label></div>
+    <div class="form-actions"><a class="button button-muted" asp-page="Index">取消</a><button class="button button-primary" type="submit">确认充值</button></div>
+</form></section><partial name="_ValidationScriptsPartial"/>

@@ -1,0 +1,40 @@
+@page
+@model PetShop.Web.Pages.Reports.ReconciliationModel
+@{ ViewData["Title"] = "日结对账"; }
+
+<header class="content-header"><div><h1>日结对账</h1><p>今天的收款、支出、退款、美容师业绩与会员卡总账。</p></div><a class="button button-muted" asp-page="/Operations/Cash">交接班</a></header>
+
+<div class="metric-grid compact-metrics">
+    <article class="metric-card"><span>今日充值本金</span><strong>¥@Model.Recharge.ToString("N2")</strong></article>
+    <article class="metric-card"><span>会员卡净消费</span><strong>¥@Model.CardSpend.ToString("N2")</strong></article>
+    <article class="metric-card"><span>外部净收款</span><strong>¥@Model.External.ToString("N2")</strong></article>
+    <article class="metric-card"><span>今日店内支出</span><strong>− ¥@Model.Expense.ToString("N2")</strong><small>其中现金 ¥@Model.CashExpense.ToString("N2")</small></article>
+</div>
+
+<section class="groupbuy-daily-line" aria-label="今日团购摘要"><div><span>今日团购核销登记</span><strong>¥@Model.GroupBuyGross.ToString("N2")</strong></div><div><span>预计平台结算</span><strong>¥@Model.GroupBuyExpected.ToString("N2")</strong></div><div><span>今日团购退款</span><strong>− ¥@Model.GroupBuyRefund.ToString("N2")</strong></div><a asp-page="/GroupBuys/Reconcile">核对到账 →</a></section>
+
+@if (Model.OpenShift is not null)
+{
+    <div class="notice error">当前还有未关闭班次（@Model.OpenShift.OpenedAt.ToString("MM-dd HH:mm") 开班），完成钱箱清点后再结束日结。</div>
+}
+else
+{
+    <div class="notice success">当前无未关闭班次。今日退款合计 ¥@Model.Refund.ToString("N2")。</div>
+}
+
+<div class="two-column">
+    <section class="content-panel">
+        <h2>余额与流水核对</h2>
+        <div class="notice @(Model.Balanced ? "success" : "error")">@(Model.Balanced ? "核对通过：所有会员余额等于逐笔流水累计。" : "核对异常：请停止继续收银并联系技术支持。") 当前总余额 ¥@Model.CardBalance.ToString("N2")</div>
+        <div class="table-wrap"><table><thead><tr><th>会员</th><th>卡余额</th><th>流水累计</th><th>结果</th></tr></thead><tbody>
+        @foreach (var x in Model.Cards) { <tr><td>@x.Name<small>@x.Number</small></td><td>本 @x.Principal.ToString("F2") / 赠 @x.Bonus.ToString("F2")</td><td>本 @x.LedgerPrincipal.ToString("F2") / 赠 @x.LedgerBonus.ToString("F2")</td><td>@(x.Ok ? "一致" : "异常")</td></tr> }
+        </tbody></table></div>
+    </section>
+    <section class="content-panel">
+        <h2>今日美容师业绩</h2>
+        <div class="table-wrap"><table><thead><tr><th>美容师</th><th>来源</th><th>完成单数</th><th>金额</th></tr></thead><tbody>
+        @foreach (var x in Model.Groomers) { <tr><td>@x.Name</td><td>@x.Channel</td><td>@x.Count</td><td>¥@x.Amount.ToString("F2")</td></tr> }
+        </tbody></table></div>
+        @if (Model.Groomers.Count == 0) { <div class="empty-state">今天尚无已完成美容工单或团购履约。</div> }
+    </section>
+</div>

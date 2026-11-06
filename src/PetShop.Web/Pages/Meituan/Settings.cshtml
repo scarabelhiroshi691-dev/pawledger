@@ -1,0 +1,9 @@
+@page
+@model PetShop.Web.Pages.Meituan.SettingsModel
+@{ ViewData["Title"] = "美团门店授权"; }
+<header class="content-header"><div><h1>美团门店授权</h1><p>正式接入后在这里绑定美团应用和门店。</p></div></header>
+<section class="content-panel integration-settings">
+    <div class="reconciliation-status"><span class="checkmark">✓</span><div><strong>@Model.ModeName 已启用</strong><small>无需真实券码即可完成查询、核销、撤销和记录验收。</small></div></div>
+    <dl class="detail-list"><dt>当前模式</dt><dd>@Model.ModeName</dd><dt>真实门店</dt><dd>尚未授权</dd><dt>正式切换条件</dt><dd>美团应用审核通过、取得接口文档、应用凭证和门店授权</dd><dt>安全规则</dt><dd>正式密钥仅存安全配置，不写入代码或数据库备份</dd></dl>
+    <div class="notice">拿到美团凭证后，只替换 IMeituanVoucherGateway 实现，现有页面、业务记录和防重复逻辑保持不变。</div>
+</section>

@@ -1,0 +1,5 @@
+@page
+@model PetShop.Web.Pages.Grooming.IndexModel
+@{ViewData["Title"]="美容工单";}
+<div class="content-header"><div><h1>美容工单</h1><p>预约、服务和结算记录统一留档。</p></div><a class="button button-primary" asp-page="Create">新建预约</a></div>
+<section class="content-panel"><div class="table-wrap"><table><thead><tr><th>单号/时间</th><th>会员与宠物</th><th>项目</th><th>美容师</th><th>应收</th><th>状态</th></tr></thead><tbody>@foreach(var x in Model.Orders){<tr><td><a asp-page="Details" asp-route-id="@x.Id">@x.OrderNumber</a><small>@x.ScheduledAt.ToString("MM-dd HH:mm")</small></td><td>@x.Customer.Name · @x.Pet.Name</td><td>@x.ServiceItem.Name</td><td>@(x.ActualGroomer?.Name??"待指定")</td><td>¥@x.AmountDue.ToString("F2")</td><td><span class="status-pill">@PetShop.Web.Pages.Grooming.IndexModel.StatusName(x.Status)</span></td></tr>}</tbody></table></div>@if(Model.Orders.Count==0){<div class="empty-state">还没有美容工单。先录入会员、员工和服务项目，再创建预约。</div>}</section>

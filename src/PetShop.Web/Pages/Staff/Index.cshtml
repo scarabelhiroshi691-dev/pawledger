@@ -1,0 +1,10 @@
+@page
+@model PetShop.Web.Pages.Staff.IndexModel
+@{ ViewData["Title"]="员工与服务"; }
+<div class="content-header"><div><h1>员工与服务</h1><p>美容工单结算时必须指定实际美容师。</p></div><a class="button button-secondary" asp-page="/Staff/Accounts">员工账号</a></div>
+@if(TempData["Success"] is string ok){<div class="notice success">@ok</div>}
+<div class="two-column"><section class="content-panel"><h2>员工</h2><form method="post" asp-page-handler="Staff" class="inline-form"><input asp-for="NewStaff.Name" placeholder="姓名"/><input asp-for="NewStaff.Phone" placeholder="手机（可选）"/><label><input asp-for="NewStaff.IsGroomer"/> 美容师</label><button class="button button-primary">添加</button></form><div asp-validation-summary="All" class="validation-summary"></div>
+<div class="table-wrap"><table><thead><tr><th>姓名</th><th>岗位</th><th>状态</th></tr></thead><tbody>@foreach(var x in Model.Staff){<tr><td>@x.Name</td><td>@(x.IsGroomer?"美容师":"店员")</td><td>@(x.IsActive?"在职":"停用")</td></tr>}</tbody></table></div>@if(Model.Staff.Count==0){<div class="empty-state">先添加至少一名美容师。</div>}</section>
+<section class="content-panel"><h2>服务项目</h2><form method="post" asp-page-handler="Service" class="inline-form"><input asp-for="NewService.Name" placeholder="例如：小型犬洗护"/><input asp-for="NewService.Price" placeholder="标准价" inputmode="decimal"/><button class="button button-primary">添加</button></form>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>标准价</th><th>状态</th></tr></thead><tbody>@foreach(var x in Model.Services){<tr><td>@x.Name</td><td>¥@x.StandardPrice.ToString("F2")</td><td>@(x.IsActive?"启用":"停用")</td></tr>}</tbody></table></div>@if(Model.Services.Count==0){<div class="empty-state">添加服务后即可创建预约。</div>}</section></div>
+<partial name="_ValidationScriptsPartial"/>
